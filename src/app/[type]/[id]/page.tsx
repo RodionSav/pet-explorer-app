@@ -186,3 +186,4 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
 };
 
 export default BreedDetails;
+
