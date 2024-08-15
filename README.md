@@ -36,10 +36,10 @@
 ### Installation Steps
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/pet-breed-explorer.git
+   git clone https://github.com/yourusername/pet--explorer-app.git
    cd pet-breed-explorer
-
-
+   npm install
+   
 ## Getting Started
 
 First, run the development server:
