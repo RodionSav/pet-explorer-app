@@ -9,7 +9,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   XMarkIcon,
-} from "@heroicons/react/24/solid"; // Добавили иконку крестика
+} from "@heroicons/react/24/solid";
 import { Spinner } from "@chakra-ui/react";
 
 const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
