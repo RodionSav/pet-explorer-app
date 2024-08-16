@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { BreedImage } from "@/types/petsTypes";
 import { getCatImages, getDogImages } from "@/api/pets";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/solid"; // Добавили иконку крестика
 import { Spinner } from "@chakra-ui/react";
 
 const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
@@ -13,10 +17,13 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
   const [breedWithImages, setBreedWithImages] = useState<BreedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   const router = useRouter();
+
+  const defaultImage = "/default-image.png";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,21 +89,47 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
   }
 
   return (
-    <div className="m-auto max-w-[1400px] p-5 bg-gradient-to-b">
+    <div className="m-auto max-w-[1400px] p-5 bg-gradient-to-b relative">
+      <button
+        onClick={() => router.back()}
+        className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-2 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105 z-10
+    sm:top-5 sm:right-5 md:top-5 md:right-5 lg:top-5 lg:right-5 fixed bottom-5 right-5 md:static flex items-center justify-center h-auto max-h-12"
+      >
+        <span className="block w-6 h-6">
+          <XMarkIcon className="w-full h-full" />
+        </span>
+      </button>
+
       <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-500 mb-8">
         {breedName}
       </h1>
       <div className="flex flex-col justify-between lg:flex-row">
         <div className="mb-6 lg:mb-0">
           {selectedImage && (
-            <Image
-              src={selectedImage}
-              alt={breedName}
-              width={500}
-              height={400}
-              className="w-full h-100 sm:w-full lg:w-[600px] lg:h-[500px] object-cover lg:object-top rounded-lg shadow-lg cursor-pointer transition-transform transform hover:scale-105"
-              onClick={() => handleImageClick(selectedImage, currentImageIndex)}
-            />
+            <div className="relative w-full h-100 sm:w-full lg:w-[600px] lg:h-[500px]">
+              {isImageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Spinner margin="auto" width="50px" height="50px" />
+                </div>
+              )}
+              <Image
+                src={selectedImage}
+                alt={breedName}
+                width={500}
+                height={400}
+                className={`w-full h-full object-cover lg:object-top rounded-lg shadow-lg cursor-pointer transition-transform transform hover:scale-105 ${
+                  isImageLoading ? "opacity-0" : "opacity-100"
+                }`}
+                onClick={() =>
+                  handleImageClick(selectedImage, currentImageIndex)
+                }
+                onLoad={() => setIsImageLoading(false)}
+                onError={() => {
+                  setIsImageLoading(false);
+                  setSelectedImage(defaultImage);
+                }}
+              />
+            </div>
           )}
         </div>
         <div className="lg:w-1/2 lg:ml-10">
@@ -125,19 +158,16 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
               <p className="font-bold text-indigo-700">Life Span:</p>
               <p className="text-gray-700">{breedLifeSpan} years</p>
             </div>
-            <button
-              onClick={() => router.back()}
-              className="mt-5 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-2 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105"
-            >
-              Back
-            </button>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 flex overflow-x-auto space-x-4 justify-start h-32 sm:h-36">
+      <div className="mt-6 flex overflow-x-auto space-x-4 justify-start h-32 sm:h-36 md:h-[165px]">
         {breedWithImages.map((image, index) => (
-          <div key={index} className="w-32 h-32 sm:w-36 sm:h-36">
+          <div
+            key={index}
+            className="min-w-[8rem] min-h-[8rem] sm:min-w-[9rem] sm:min-h-[9rem] flex-shrink-0"
+          >
             <Image
               src={image.url}
               alt={`Thumbnail ${index}`}
@@ -145,6 +175,7 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
               height={128}
               className="w-full h-full object-cover rounded-lg cursor-pointer border-2 border-gray-300 hover:border-indigo-500"
               onClick={() => handleImageClick(image.url, index)}
+              onError={(e) => (e.currentTarget.src = defaultImage)}
             />
           </div>
         ))}
@@ -159,6 +190,7 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
               width={800}
               height={600}
               className="w-full h-[700px] object-contain rounded-lg"
+              onError={(e) => (e.currentTarget.src = defaultImage)}
             />
             <button
               onClick={() => setIsModalOpen(false)}
@@ -168,13 +200,13 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
             </button>
             <button
               onClick={handlePreviousImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white bg-blue-500 hover:bg-blue-600 rounded-full p-2 shadow-lg transition-transform hover:scale-105"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-blue-500 hover:bg-blue-600 rounded-full p-2 shadow-lg transition-transform transform hover:scale-105"
             >
               <ChevronLeftIcon className="w-6 h-6" />
             </button>
             <button
               onClick={handleNextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white bg-blue-500 hover:bg-blue-600 rounded-full p-2 shadow-lg transition-transform hover:scale-105"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-blue-500 hover:bg-blue-600 rounded-full p-2 shadow-lg transition-transform transform hover:scale-105"
             >
               <ChevronRightIcon className="w-6 h-6" />
             </button>
@@ -186,4 +218,3 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
 };
 
 export default BreedDetails;
-

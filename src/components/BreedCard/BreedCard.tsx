@@ -1,23 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Breed } from "@/types/petsTypes";
+import { extractAnimalType } from "@/utils/utils";
 
 interface BreedCardProps {
   breed: Breed;
 }
 
 const BreedCard: React.FC<BreedCardProps> = ({ breed }) => {
-  const extractAnimalType = (url: string): string | null => {
-    const regex = /(dog|cat)/;
-    const match = url.match(regex);
-    return match ? match[0] : null;
-  };
-
   const type = extractAnimalType(breed.image.url);
 
   return (
     <Link href={`/${type}/${breed.id}`} passHref>
-      <div className="border border-blue-200 rounded-lg overflow-hidden p-4 h-[250px] md:h-[340px] w-[135px] sm:w-[200px] md:w-[230px] hover:shadow-xl hover:cursor-pointer hover:scale-105 hover:bg-gradient-to-br from-blue-300 to-blue-100 transition-transform bg-white/80 backdrop-blur-md">
+      <div className="border border-blue-200 rounded-lg overflow-hidden p-4 w-[220px] h-[270px] md:h-[340px] sm:w-[200px] md:w-[230px] hover:shadow-xl hover:cursor-pointer hover:scale-105 hover:bg-gradient-to-br from-blue-300 to-blue-100 transition-transform bg-white/80 backdrop-blur-md">
         <Image
           src={breed.image.url}
           alt={breed.name}
