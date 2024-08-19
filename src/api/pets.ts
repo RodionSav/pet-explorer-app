@@ -1,14 +1,6 @@
 import { Breed, BreedImage } from "@/types/petsTypes";
+import { CAT_API_BASE_URL, CATKEY, DOG_API_BASE_URL, DOGKEY } from "@/utils/constants";
 import { client } from "@/utils/fetchClient";
-
-const CAT_API_BASE_URL = "https://api.thecatapi.com/v1";
-const DOG_API_BASE_URL = "https://api.thedogapi.com/v1";
-
-const CATKEY =
-  "live_QX3VdcrYXDSTWikM7fOF2DH0VUw5Rs6hQsXhHvyPu4NnP6ALjWZWLCBa9SIgZF6M";
-
-const DOGKEY =
-  "live_Zhh6E3bAUyRt0gN1tFeoCLxlzBQMCYhF5QvLpUwxsTAj4VLoKQfErICqvX1AhzwI";
 
 export const getCatBreeds = () => {
   return client.get<Breed[]>(
@@ -26,7 +18,7 @@ export const getCatImages = (breedId: string) => {
 export const getDogBreeds = () => {
   return client.get<Breed[]>(
     DOG_API_BASE_URL,
-    `/breeds?limit=30&page=0&api_key=${DOGKEY}`
+    `/breeds?limit=34&page=0&api_key=${DOGKEY}`
   );
 };
 

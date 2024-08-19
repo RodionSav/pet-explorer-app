@@ -11,6 +11,8 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { Spinner } from "@chakra-ui/react";
+import { normalizeData, handleImageError } from "../../../utils/utils";
+import { defaultImage } from "../../../utils/constants";
 
 const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
   const { id, type } = params;
@@ -23,8 +25,6 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
 
   const router = useRouter();
 
-  const defaultImage = "/default-image.png";
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -35,8 +35,10 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
         } else {
           response = await getDogImages(id);
         }
-        setBreedWithImages(response);
-        setSelectedImage(response[0]?.url || null);
+        const normalizedData = normalizeData(response);
+
+        setBreedWithImages(normalizedData.images);
+        setSelectedImage(normalizedData.images[0]?.url || null);
         setCurrentImageIndex(0);
       } finally {
         setIsLoading(false);
@@ -106,7 +108,7 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
       <div className="flex flex-col justify-between lg:flex-row">
         <div className="mb-6 lg:mb-0">
           {selectedImage && (
-            <div className="relative w-full h-100 sm:w-full lg:w-[600px] lg:h-[500px]">
+            <div className="relative w-full h-100 sm:w-full lg:w-[500px] lg:h-[400px]">
               {isImageLoading && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Spinner margin="auto" width="50px" height="50px" />
@@ -124,10 +126,7 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
                   handleImageClick(selectedImage, currentImageIndex)
                 }
                 onLoad={() => setIsImageLoading(false)}
-                onError={() => {
-                  setIsImageLoading(false);
-                  setSelectedImage(defaultImage);
-                }}
+                onError={(e) => handleImageError(e, defaultImage)}
               />
             </div>
           )}
@@ -175,7 +174,7 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
               height={128}
               className="w-full h-full object-cover rounded-lg cursor-pointer border-2 border-gray-300 hover:border-indigo-500"
               onClick={() => handleImageClick(image.url, index)}
-              onError={(e) => (e.currentTarget.src = defaultImage)}
+              onError={(e) => handleImageError(e, defaultImage)}
             />
           </div>
         ))}
@@ -190,7 +189,7 @@ const BreedDetails = ({ params }: { params: { id: string; type: string } }) => {
               width={800}
               height={600}
               className="w-full h-[700px] object-contain rounded-lg"
-              onError={(e) => (e.currentTarget.src = defaultImage)}
+              onError={(e) => handleImageError(e, defaultImage)}
             />
             <button
               onClick={() => setIsModalOpen(false)}

@@ -3,16 +3,17 @@ import BreedCard from "../BreedCard/BreedCard";
 import { getCatBreeds, getDogBreeds } from "@/api/pets";
 import { Breed } from "@/types/petsTypes";
 import { Spinner } from "@chakra-ui/react";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 
 interface BreedListProps {
   itemsPerPage?: number;
 }
 
-const BreedList: React.FC<BreedListProps> = ({ itemsPerPage = 6 }) => {
+const BreedList: React.FC<BreedListProps> = ({ itemsPerPage = 8 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [breeds, setBreeds] = useState<Breed[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
 
   const totalPages = Math.ceil(breeds.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -42,56 +43,16 @@ const BreedList: React.FC<BreedListProps> = ({ itemsPerPage = 6 }) => {
     fetchBreeds();
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const getPaginationButtons = () => {
-    const pages = [];
-    let minPage, maxPage;
-
-    if (isMobile) {
-      minPage = Math.max(1, currentPage - 1);
-      maxPage = Math.min(totalPages, currentPage + 1);
-    } else {
-      minPage = Math.max(1, currentPage - 2);
-      maxPage = Math.min(totalPages, currentPage + 2);
-    }
-
-    if (minPage > 2 && !isMobile) {
-      pages.push(1, "...");
-    } else if (minPage === 2) {
-      pages.push(1);
-    }
-
-    for (let i = minPage; i <= maxPage; i++) {
-      pages.push(i);
-    }
-
-    if (maxPage < totalPages - 1 && !isMobile) {
-      pages.push("...", totalPages);
-    } else if (maxPage === totalPages - 1) {
-      pages.push(totalPages);
-    }
-
-    return pages;
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
+    setCurrentPage(page);
   };
 
   return (
     <div className="mb-8">
-      <div className="flex flex-wrap mx-auto justify-center gap-2 p-0 mt-2 h-[1660px] w-[192px] sm:w-[470px] sm:h-[760px] md:h-[1060px] lg:w-[710px] lg:h-[700px]">
+      <div className="flex flex-wrap mx-auto gap-2 p-0 mt-2 h-[2260px] w-[222px] sm:w-[410px] sm:h-[1120px] md:w-[470px] md:h-[1390px] lg:w-[945px] lg:h-[700px]">
         {loading && (
           <div className="col-span-full flex justify-center items-center m-auto h-96">
             <Spinner
@@ -114,44 +75,65 @@ const BreedList: React.FC<BreedListProps> = ({ itemsPerPage = 6 }) => {
         )}
       </div>
 
-      <div className="flex justify-center mt-4 gap-2">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="w-[40px] h-[40px] bg-blue-700 text-white rounded-lg hover:shadow-[0px_0px_10px_white] transition duration-200 ease-in-out disabled:bg-gray-400"
-        >
-          &#8249;
-        </button>
-        {getPaginationButtons().map((page, index) =>
-          typeof page === "number" ? (
-            <button
-              key={index}
-              onClick={() => handlePageChange(page)}
-              className={`w-[40px] h-[40px] text-white rounded-lg transition duration-200 ease-in-out ${
-                currentPage === page
-                  ? "bg-blue-900 text-blue-700"
-                  : "bg-blue-700 hover:shadow-[0px_0px_10px_white]"
-              }`}
-            >
-              {page}
-            </button>
-          ) : (
-            <span
-              key={index}
-              className="w-[40px] h-[40px] flex items-center justify-center text-white"
-            >
-              {page}
-            </span>
-          )
-        )}
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="w-[40px] h-[40px] bg-blue-700 text-white rounded-lg hover:shadow-[0px_0px_10px_white] transition duration-200 ease-in-out disabled:bg-gray-400"
-        >
-          &#8250;
-        </button>
-      </div>
+      <Stack spacing={1} alignItems="center" className="mt-4">
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          variant="outlined"
+          shape="rounded"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "white",
+              backgroundColor: "#1E90FF",
+              width: "40px",
+              height: "40px",
+              minWidth: "28px",
+              borderRadius: "4px",
+              margin: "0 2px",
+              "@media (max-width: 500px)": {
+                width: "30px",
+                height: "30px",
+                fontSize: "12px",
+              },
+              "@media (max-width: 320px)": {
+                width: "15px",
+                height: "15px",
+                fontSize: "10px",
+              },
+            },
+            "& .Mui-selected": {
+              backgroundColor: "#0B5394",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#0B5394",
+              },
+            },
+            "& .MuiPaginationItem-root:hover": {
+              backgroundColor: "#1E90FF",
+            },
+            "& .MuiPaginationItem-ellipsis": {
+              backgroundColor: "#1E90FF",
+              color: "white",
+              width: "40px",
+              height: "40px",
+              borderRadius: "4px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              "@media (max-width: 500px)": {
+                width: "30px",
+                height: "30px",
+              },
+              "@media (max-width: 320px)": {
+                width: "15px",
+                height: "15px",
+              },
+            },
+          }}
+        />
+      </Stack>
     </div>
   );
 };

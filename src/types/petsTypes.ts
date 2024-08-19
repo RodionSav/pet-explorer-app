@@ -1,7 +1,7 @@
 export interface Breed {
   weight: {
-      imperial: string;
-      metric: string;
+    imperial: string;
+    metric: string;
   };
   id: number;
   name: string;
@@ -40,10 +40,10 @@ export interface Breed {
   hypoallergenic: number;
   reference_image_id: string;
   image: {
-      id: string;
-      width: number;
-      height: number;
-      url: string;
+    id: string;
+    width: number;
+    height: number;
+    url: string;
   };
 }
 
@@ -57,8 +57,8 @@ export interface BreedImage {
 
 export interface BreedForImageResponse {
   weight: {
-      imperial: string;
-      metric: string;
+    imperial: string;
+    metric: string;
   };
   id: string;
   name: string;
@@ -97,4 +97,13 @@ export interface BreedForImageResponse {
   wikipedia_url: string;
   hypoallergenic: number;
   reference_image_id: string;
+}
+
+export interface NormalizedBreedData {
+  breedName: string;
+  breedDescription: string;
+  breedWeight: string;
+  breedTemperament: string;
+  breedLifeSpan: string;
+  images: BreedImage[];
 }
