@@ -1,4 +1,4 @@
-import { BreedImage, NormalizedBreedData } from "@/types/petsTypes";
+import { NormalizedBreedData } from "@/types/petsTypes";
 
 
 
